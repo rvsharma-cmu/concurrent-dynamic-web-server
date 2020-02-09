@@ -4,15 +4,15 @@ CFLAGS =-g -O2 -Wall
 # Others systems will probably require something different.
 LDLIBS=-lpthread
 
-all: tiny cgi
+all: webserver cgi
 
-tiny: tiny.c csapp.c
+webserver: webserver.c csapp.c
 
 cgi:
 	(cd cgi-bin; make)
 
 tar:
-	(cd ..; tar cvf tiny.tar tiny)
+	(cd ..; tar cvf webserver.tar webserver)
 
 clean:
 	rm -f *.o tiny *~

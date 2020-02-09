@@ -9,8 +9,28 @@
  *     GET method to serve static and dynamic content.
  */
 #include "csapp.h"
+#include <stdio.h>
+#include <string.h>
+#include <strings.h>
+
+//#define DEBUG // uncomment this line to enable debugging
+
+#ifdef DEBUG
+/* When debugging is enabled, these form aliases to useful functions */
+#define dbg_printf(...) printf(__VA_ARGS__)
+#define dbg_requires(...) assert(__VA_ARGS__)
+#define dbg_assert(...) assert(__VA_ARGS__)
+#define dbg_ensures(...) assert(__VA_ARGS__)
+#else
+/* When debugging is disabled, no code gets generated for these */
+#define dbg_printf(...)
+#define dbg_requires(...)
+#define dbg_assert(...)
+#define dbg_ensures(...)
+#endif
 
 void doit(int fd);
+void *thread(void *vargp);
 void read_requesthdrs(rio_t *rp);
 int parse_uri(char *uri, char *filename, char *cgiargs);
 void serve_static(int fd, char *filename, int filesize);
@@ -19,31 +39,71 @@ void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum,
                  char *shortmsg, char *longmsg);
 
+/*
+  String to use for the User-Agent header.
+  Don't forget to terminate with \r\n
+*/
+static char *hdr_useragent_value = "User-Agent: Mozilla/5.0"
+                                   " (X11; Linux x86_64; rv:3.10.0)"
+                                   " Gecko/20181101 Firefox/61.0.1\r\n";
+static char *hdr_connection_value = "Connection: close\r\n";
+static char *hdr_proxyconn_value = "Proxy-Connection: close\r\n";
+
+static char *hdr_useragent_key = "User-Agent:";
+static char *hdr_connection_key = "Connection:";
+static char *hdr_proxyconn_key = "Proxy-Connection";
+
+/**
+ * inputs the argument for the proxy server and gets the port on which
+ * to listen. It will then open the port on that port number
+ * and wait for a connection from its web client
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char **argv)
 {
-    int listenfd, connfd;
+    int listenfd, *connfd;
     char hostname[MAXLINE], port[MAXLINE];
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
-
+    pthread_t tid;
     /* Check command line args */
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
         exit(1);
     }
 
+    // handler for SIGPIPE signals
+    Signal(SIGPIPE, SIG_IGN);
+
     listenfd = Open_listenfd(argv[1]);
     while (1) {
-        clientlen = sizeof(clientaddr);
-        connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
+        clientlen = sizeof(struct sockaddr_storage);
+        connfd = Malloc(sizeof(int));
+
+        *connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen); //line:netp:tiny:accept
+        Pthread_create(&tid, NULL, thread, connfd);
         Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE,
                     port, MAXLINE, 0);
         printf("Accepted connection from (%s, %s)\n", hostname, port);
-        doit(connfd);                                             //line:netp:tiny:doit
-        Close(connfd);                                            //line:netp:tiny:close
     }
 }
 /* $end tinymain */
+
+/**
+ * thread function for concurrent serving
+ * concurrently spawned proxies.
+ */
+void *thread(void *vargp)
+{
+    int connfd = *((int *)vargp);
+    Pthread_detach(pthread_self());
+    Free(vargp);
+    doit(connfd);                                             //line:netp:tiny:doit
+    Close(connfd);                                            //line:netp:tiny:close
+    return NULL;
+}
 
 /*
  * doit - handle one HTTP request/response transaction
