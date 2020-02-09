@@ -39,19 +39,6 @@ void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum,
                  char *shortmsg, char *longmsg);
 
-/*
-  String to use for the User-Agent header.
-  Don't forget to terminate with \r\n
-*/
-static char *hdr_useragent_value = "User-Agent: Mozilla/5.0"
-                                   " (X11; Linux x86_64; rv:3.10.0)"
-                                   " Gecko/20181101 Firefox/61.0.1\r\n";
-static char *hdr_connection_value = "Connection: close\r\n";
-static char *hdr_proxyconn_value = "Proxy-Connection: close\r\n";
-
-static char *hdr_useragent_key = "User-Agent:";
-static char *hdr_connection_key = "Connection:";
-static char *hdr_proxyconn_key = "Proxy-Connection";
 
 /**
  * inputs the argument for the proxy server and gets the port on which
@@ -86,7 +73,8 @@ int main(int argc, char **argv)
         Pthread_create(&tid, NULL, thread, connfd);
         Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE,
                     port, MAXLINE, 0);
-        printf("Accepted connection from (%s, %s)\n", hostname, port);
+        printf("accepted connection from (%s, %s) via thread"
+               "%d\n", hostname, port, (int)tid);
     }
 }
 /* $end tinymain */
