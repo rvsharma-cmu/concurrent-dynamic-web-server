@@ -7,10 +7,8 @@
  * tiny.c - A simple, iterative HTTP/1.0 Web server that uses the
  *     GET method to serve static and dynamic content.
  */
-#include "csapp.h"
 #include <dlfcn.h>
-
-
+#include "csapp.h"
 
 void* handle_request(void* arg);
 void doit(int fd);
