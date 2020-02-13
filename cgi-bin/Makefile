@@ -1,9 +1,10 @@
 CC = gcc
-CFLAGS = -g -O2 -Wall
+CFLAGS = -shared -fPIC -O2 -Wall -I ..
 
 all: adder
 
-adder: adder.c
+adder: adder.c csapp.o
+	$(CC) $(CFLAGS) -o adder.so adder.c csapp.o
 
 clean:
-	rm -f adder *~
+	rm -f *.o adder *~
