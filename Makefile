@@ -3,7 +3,7 @@ CFLAGS = -g -O2 -w -rdynamic -I .
 BASICFLAGS = -O2 -w -I .
 # This flag includes the Pthreads library on a Linux box.
 # Others systems will probably require something different.
-LIB = -lpthread
+LIB = -lpthread -ldl
 
 all: tiny cgi
 
