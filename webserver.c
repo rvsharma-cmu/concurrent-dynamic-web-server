@@ -229,8 +229,6 @@ void serve_dynamic(int fd, char *function_name, char *cgiargs)
     sprintf(buf, "Server: Tiny Web Server\r\n");
     write(fd, buf, strlen(buf));
 
-    //#ifdef OLD
-
     sprintf(buf, "./cgi-bin/%s.so", function_name);
     size = getfilesize(buf);
     if ((handle = dlopen(buf, RTLD_LAZY)) == NULL) {

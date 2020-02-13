@@ -42,11 +42,11 @@
 typedef struct cacheline cacheline_t;
 typedef struct cacheq cacheq_t;
 
+
 typedef struct cacheline{
     char *key;
     char *web_object;
     size_t size;
-    int age;
     cacheline_t *next;
 }cacheline_t;
 
