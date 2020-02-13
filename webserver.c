@@ -7,8 +7,8 @@
  * tiny.c - A simple, iterative HTTP/1.0 Web server that uses the
  *     GET method to serve static and dynamic content.
  */
-#include <dlfcn.h>
 #include "csapp.h"
+#include <dlfcn.h>
 
 void* handle_request(void* arg);
 void doit(int fd);
@@ -30,15 +30,17 @@ int main(int argc, char **argv)
     struct sockaddr_in clientaddr;
     pthread_t tid;
 
+    printf("Hello\n");
+
 
     /* Check command line args */
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
         exit(1);
     }
-    port = atoi(argv[1]);
 
-    listenfd = Open_listenfd(port);
+    listenfd = Open_listenfd(argv[1]);
+    printf("Came here\n");
     while (1) {
         clientlen = sizeof(clientaddr);
         connfd_ptr = (int*) Malloc(sizeof(int));
@@ -250,9 +252,9 @@ void serve_dynamic(int fd, char *function_name, char *cgiargs)
     }
 
     printf("Opened file and got handle to function\n");
-    /* Get the function (from dlysm) and add to cache */
 
     function = dlsym(handle, function_name);
+    printf("function name is :%s\n", function_name);
 
     if ((error = dlerror()) != NULL) {
         printf("Invalid function error: %s %s\n", function_name, error);
