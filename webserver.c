@@ -241,7 +241,7 @@ void serve_dynamic(int fd, char *function_name, char *cgiargs)
 
     //#ifdef OLD
 
-    sprintf(buf, "./lib/%s.so", function_name);
+    sprintf(buf, "./cgi-bin/%s.so", function_name);
     size = getfilesize(buf);
     if ((handle = dlopen(buf, RTLD_LAZY)) == NULL) {
         sprintf(buf, "%s\n", dlerror());
