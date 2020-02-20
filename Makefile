@@ -11,6 +11,7 @@ tiny: webserver.c csapp.o
 	$(CC) $(CFLAGS) -o webserver webserver.c csapp.o $(LIB)
 
 baseline: tiny_base.c csapp.o
+	(cd cgi-bin; make base)
 	$(CC) $(BASICFLAGS) -o tiny_base tiny_base.c csapp.o $(LIB)
 
 csapp.o:
@@ -20,7 +21,7 @@ cgi:
 	(cd cgi-bin; make)
 
 clean:
-	rm -f *.o webserver *~
+	rm -f *.o webserver tiny_base *~
 	(cd cgi-bin; make clean)
 
 
