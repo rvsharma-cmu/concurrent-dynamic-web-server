@@ -28,6 +28,7 @@ void adder(int fd, char* args) {
     printf("Content-length: %lu\r\n", strlen(content));
     printf("Content-type: text/html\r\n\r\n");
     //printf("Content: %s\n", content);
+    printf("n1 + n2 = %d\n", n1+n2);
     Rio_writen(fd, content, strlen(content));
     return;
 }
