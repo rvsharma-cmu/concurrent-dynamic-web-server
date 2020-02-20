@@ -1,7 +1,6 @@
 //
 // Created by Raghav Sharma on 12/02/20.
 //
-
 /* $begin tinymain */
 /*
  * tiny.c - A simple, iterative HTTP/1.0 Web server that uses the
@@ -19,9 +18,7 @@ void get_filetype(char *function_name, char *filetype);
 void serve_dynamic(int fd, char *function_name, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum,
                  char *shortmsg, char *longmsg);
-void close_fd(int fd);
-
-
+void cleanup(int fd);
 
 int main(int argc, char **argv)
 {
@@ -29,9 +26,6 @@ int main(int argc, char **argv)
     int* connfd_ptr;
     struct sockaddr_in clientaddr;
     pthread_t tid;
-
-    printf("Hello\n");
-
 
     /* Check command line args */
     if (argc != 2) {
@@ -44,7 +38,6 @@ int main(int argc, char **argv)
         clientlen = sizeof(clientaddr);
         connfd_ptr = (int*) Malloc(sizeof(int));
         *connfd_ptr = Accept(listenfd, (SA *)&clientaddr, &clientlen);
-        printf("Connection made.\n");
         Pthread_create(&tid, NULL, handle_request, (void*) connfd_ptr);
     }
 }
@@ -82,7 +75,7 @@ void doit(int fd)
     if (strcasecmp(method, "GET")) {
         clienterror(fd, method, "501", "Not Implemented",
                     "Tiny does not implement this method");
-        close_fd(fd);
+        cleanup(fd);
         return;
     }
     read_requesthdrs(&rio);
@@ -92,14 +85,14 @@ void doit(int fd)
     if (stat(function_name, &sbuf) < 0 && is_static) {
         clienterror(fd, function_name, "404", "Not found",
                     "Tiny couldn't find this file");
-        close_fd(fd);
+        cleanup(fd);
         return;
     }
     if (is_static) { /* Serve static content */
         if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
             clienterror(fd, function_name, "403", "Forbidden",
                         "Tiny couldn't read the file");
-            close_fd(fd);
+            cleanup(fd);
             return;
         }
         serve_static(fd, function_name, sbuf.st_size);
@@ -108,7 +101,7 @@ void doit(int fd)
 
         serve_dynamic(fd, function_name, cgiargs);
     }
-    close_fd(fd);
+    cleanup(fd);
 }
 /* $end doit */
 
@@ -202,11 +195,6 @@ void get_filetype(char *function_name, char *filetype)
 }
 /* $end serve_static */
 
-size_t getfilesize(char* filename) {
-    struct stat st;
-    stat(filename, &st);
-    return st.st_size;
-}
 
 /*
  * serve_dynamic - run a CGI program on behalf of the client
@@ -221,6 +209,7 @@ void serve_dynamic(int fd, char *function_name, char *cgiargs)
     char *error;
     size_t size;
 
+    sprintf(buf, "Hello\n");
     write(fd, buf, strlen(buf));
 
     /* Return first part of HTTP response */
@@ -230,15 +219,14 @@ void serve_dynamic(int fd, char *function_name, char *cgiargs)
     write(fd, buf, strlen(buf));
 
     sprintf(buf, "./cgi-bin/%s.so", function_name);
-    size = getfilesize(buf);
-    if ((handle = dlopen(buf, RTLD_LAZY)) == NULL) {
+
+    if ((handle = dlopen(buf, RTLD_GLOBAL|RTLD_LAZY)) == NULL) {
         sprintf(buf, "%s\n", dlerror());
         write(fd, buf, strlen(buf));
         return;
     }
 
     function = dlsym(handle, function_name);
-    printf("function name is :%s\n", function_name);
 
     if ((error = dlerror()) != NULL) {
         printf("Invalid function error: %s %s\n", function_name, error);
@@ -251,12 +239,11 @@ void serve_dynamic(int fd, char *function_name, char *cgiargs)
     if (function != NULL) {
         function(fd, cgiargs);
     }
-
-    //#endif
 }
 /* $end serve_dynamic */
 
-void close_fd(int fd) {
+/* cleanup -- Frees up descriptors in use and ends thread */
+void cleanup(int fd) {
     Close(fd);
     Pthread_exit(NULL);
 }
