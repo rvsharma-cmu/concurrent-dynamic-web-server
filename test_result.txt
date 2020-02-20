@@ -1,0 +1,109 @@
+raghavs-air:ip raghavs$ ab -n 1000 -c 50 "http://unix8.andrew.cmu.edu:8090/cgi-bin/adder?2&4"
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking unix8.andrew.cmu.edu (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        unix8.andrew.cmu.edu
+Server Port:            8090
+
+Document Path:          /cgi-bin/adder?2&4
+Document Length:        0 bytes
+
+Concurrency Level:      50
+Time taken for tests:   10.104 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      153000 bytes
+HTML transferred:       0 bytes
+Requests per second:    98.97 [#/sec] (mean)
+Time per request:       505.180 [ms] (mean)
+Time per request:       10.104 [ms] (mean, across all concurrent requests)
+Transfer rate:          14.79 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        2    6  45.7      3    1040
+Processing:     2    4   7.9      3     242
+Waiting:        2    3   2.3      3      50
+Total:          4   10  46.3      7    1043
+
+Percentage of the requests served within a certain time (ms)
+  50%      7
+  66%      8
+  75%      8
+  80%      9
+  90%     11
+  95%     13
+  98%     17
+  99%     23
+ 100%   1043 (longest request)
+raghavs-air:ip raghavs$ ab -n 1000 -c 50 "http://unix8.andrew.cmu.edu:8090/cgi-bin/adder1?2&4"
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking unix8.andrew.cmu.edu (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        Tiny
+Server Hostname:        unix8.andrew.cmu.edu
+Server Port:            8090
+
+Document Path:          /cgi-bin/adder1?2&4
+Document Length:        105 bytes
+
+Concurrency Level:      50
+Time taken for tests:   2.600 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      214000 bytes
+HTML transferred:       105000 bytes
+Requests per second:    384.65 [#/sec] (mean)
+Time per request:       129.987 [ms] (mean)
+Time per request:       2.600 [ms] (mean, across all concurrent requests)
+Transfer rate:          80.39 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        2    6   6.5      5      94
+Processing:    11  118  29.1    116     214
+Waiting:        3  117  28.9    115     206
+Total:         17  124  28.2    121     217
+
+Percentage of the requests served within a certain time (ms)
+  50%    121
+  66%    128
+  75%    135
+  80%    139
+  90%    157
+  95%    181
+  98%    199
+  99%    204
+ 100%    217 (longest request)
+raghavs-air:ip raghavs$ 
